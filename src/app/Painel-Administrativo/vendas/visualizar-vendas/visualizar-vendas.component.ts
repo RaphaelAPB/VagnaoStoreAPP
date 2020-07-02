@@ -7,6 +7,8 @@ import { EnderecoEntregaService } from 'src/app/commum/service/endereco-entrega.
 import { VendasService } from './../../../commum/service/vendas.service';
 import { EnderecoEntrega } from 'src/app/commum/model/enderecoEntrega.model';
 import { Vendas } from './../../../commum/model/vendas.model';
+import { VendaComEndereco } from 'src/app/commum/model/vendaComEndereco.mode';
+import { variaveisGlobais } from 'src/app/commum/variaveis-globais';
 
 
 @Component({
@@ -18,35 +20,35 @@ export class VisualizarVendasComponent implements OnInit {
 
   private httpReq: Subscription
 
-  //enderecoEntrega: EnderecoEntrega = null
-  venda: Vendas
+  venda: VendaComEndereco
   messageApi: string
   statusResponse: number
 
   constructor(
     private service: VendasService,
-    //private serviceE: EnderecoEntrega,
     private _activatedRoute: ActivatedRoute,
     private router: Router
-  ) { 
-    
+  ) {
+
   }
-  
+
   ngOnInit(): void {
-    const id = this._activatedRoute.snapshot.params['id']
-  
-    this.getVenda(id)
+    if (variaveisGlobais.idAdm == null) {
+      this.router.navigate(['/login'])
+    } else {
+      const id = this._activatedRoute.snapshot.params['id']
+
+      this.getVenda(id)
+    }
   }
-  
-  getVenda(id: number){
-    this.httpReq = this.service.getVenda(id).subscribe(res => {
+
+  getVenda(id: number) {
+    this.httpReq = this.service.getVendaComEnderecoEntrega(id).pipe().subscribe(res => {
       this.statusResponse = res.body['message']
-      this.venda = res.body.data[0]
-     
-      //getidusuario, endereçoentrega
-    }, err =>{
+      this.venda = res.body['date'][0]
+    }, err => {
       this.messageApi = err.error['message']
     })
   }
-  
-  }
+
+}
